@@ -187,6 +187,8 @@ contract BorrowingMany {
         uint _amountDue = ledger[msg.sender].amountDue;
         require(_amountDue == msg.value, "This is not the amount you owe, please enter correct amount");
         
+        owner.transfer(msg.value);
+        
         LoanDetails memory paidLoan;
         paidLoan.borrower = payable(msg.sender);
         paidLoan.amountDue = 0;
@@ -198,8 +200,6 @@ contract BorrowingMany {
         }
         
         ledger[msg.sender] = paidLoan;
-        
-        owner.transfer(msg.value);
             
         emit LoanPaidBack(msg.sender, ledger[msg.sender].earlyPay); //Lender can decide to handle this event in application to give some reward for paying early.
         
