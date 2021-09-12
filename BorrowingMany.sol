@@ -112,6 +112,7 @@ contract BorrowingMany {
     
     function loanProposal(uint _amount) public onlyOpen {
         require(msg.sender != owner, "You cannot be lender and borrower");
+        require(ledger[msg.sender].amountDue == 0, "Please pay off outstanding loan first");
         require(_amount <= maxLoan, "The amount exceeds the maximum amount available for borrowing");
         
         bool proposalPending = ledger[msg.sender].amountProposed > 0; 
@@ -145,6 +146,8 @@ contract BorrowingMany {
         uint _amount = ledger[_borrower].amountProposed;
         address payable _to = ledger[_borrower].borrower; 
         
+        _to.transfer(_amount);
+        
         remove(ledger[_borrower].key);
         
         LoanDetails memory loan;
@@ -157,8 +160,6 @@ contract BorrowingMany {
         loan.key = 0;
         
         ledger[_borrower] = loan;
-        
-        _to.transfer(_amount);
             
         emit LoanGranted(_borrower, _amount);
         
